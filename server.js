@@ -25,19 +25,26 @@ app.get('/', (req, res) => {
       })
   })
 
+//   challenge 1: POST request, save product information
 app.post('/api/product', (req, res) => {
     // console.log(req.body)
     db.collection('product').save(req.body, (err, result) => {
+        var result_json = {
+            api_status: "",
+            data: {}
+        };
         if (err) {
-            res.status(500).send({ api_status: "error", error_details: err });
+            result_json.api_status = "error";
+            res.status(500).send(result_json);
         } else {
-            res.status(200).send(result.ops[0]);
+            result_json.api_status = "good";
+            result_json.data = result.ops[0];
+            res.status(200).send(result_json);
         }
     })
-
-    
   })
 
+//   challenge 2: GET request, get product information by ID
   app.get('/api/product', (req, res) => {
       console.log(req.query);
       find_one_query = {id: req.query.id};
