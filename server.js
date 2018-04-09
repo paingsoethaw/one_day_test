@@ -47,8 +47,7 @@ app.post('/api/product', (req, res) => {
 
 //   challenge 2: GET request, get product information by ID
   app.get('/api/product', (req, res) => {
-      console.log(req.query);
-
+    //   console.log(req.query);
     db.collection('product').findOne({_id: new ObjectId(req.query.id)}, function(err, result) {
         // console.log(result);
         var result_json = {
@@ -65,3 +64,31 @@ app.post('/api/product', (req, res) => {
         }
       })
   })
+
+  //   challenge 3: PUT request, update product information by ID
+  app.put('/api/product/:id', function (req, res) {
+    // console.log(req.body);
+    // console.log(req.params.id);
+
+    db.collection('product').findOneAndUpdate(
+        {_id: new ObjectId(req.params.id)},
+        {
+          $set: req.body
+        },
+        { new: true, returnOriginal:false }
+     ).then(function (coll) {
+         console.log(coll);
+        res.json({
+            error: false,
+            data: coll.value
+        })
+    })
+    .catch(function (err) {
+        res.status(500).json({
+            error: true,
+            data: {
+                message: err.message
+            }
+        })
+    })
+})
