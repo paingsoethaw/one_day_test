@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser= require('body-parser')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
+var ObjectId = require('mongodb').ObjectID;
 
 // app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
@@ -18,9 +19,9 @@ MongoClient.connect('mongodb://lab_user:lab_user123@ds239309.mlab.com:39309/one_
 app.get('/', (req, res) => {
     db.collection('product').find().toArray(function(err, results) {
         if (err) {
-            res.status(500).send({ api_status: "error", error_details: err });
+            res.status(500).json({ api_status: "error", error_details: err });
         } else {
-            res.status(200).send(results);
+            res.status(200).json(results);
         }
       })
   })
@@ -35,11 +36,11 @@ app.post('/api/product', (req, res) => {
         };
         if (err) {
             result_json.api_status = "error";
-            res.status(500).send(result_json);
+            res.status(500).json(result_json);
         } else {
             result_json.api_status = "good";
             result_json.data = result.ops[0];
-            res.status(200).send(result_json);
+            res.status(200).json(result_json);
         }
     })
   })
@@ -47,12 +48,20 @@ app.post('/api/product', (req, res) => {
 //   challenge 2: GET request, get product information by ID
   app.get('/api/product', (req, res) => {
       console.log(req.query);
-      find_one_query = {id: req.query.id};
-    db.collection('product').findOne(find_one_query, function(err, result) {
+
+    db.collection('product').findOne({_id: new ObjectId(req.query.id)}, function(err, result) {
+        // console.log(result);
+        var result_json = {
+            api_status: "",
+            data: {}
+        };
         if (err) {
-            res.status(500).send({ api_status: "error", error_details: err });
+            result_json.api_status = "error";
+            res.status(500).json(result_json);
         } else {
-            res.status(200).send(result);
+            result_json.api_status = "good";
+            result_json.data = result;
+            res.status(200).json(result_json);
         }
       })
   })
