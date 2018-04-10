@@ -41,7 +41,7 @@ app.post('/api/product', (req, res) => {
     }
     if (typeof price !== 'number') {
         price = parseInt(price);
-      }
+    }
     if (isNaN(price) || price < 0) {
         result_json.api_status = "error";
         result_json.data = '"Price" is required and must be number';
@@ -98,7 +98,7 @@ app.put('/api/product/:id', (req, res) => {
     }
     if (typeof price !== 'number') {
         price = parseInt(price);
-      }
+    }
     if (isNaN(price) || price < 0) {
         result_json.api_status = "error";
         result_json.data = '"Price" is required and must be number';
@@ -127,10 +127,10 @@ app.put('/api/product/:id', (req, res) => {
 })
 
 //   challenge 4: Delete request, delete product information by ID
-app.delete('/api/product/:id', (req, res) => {
+app.delete('/api/product/:id', function (req, res) {
     var result_json = {
         api_status: "",
-        data: {}
+        data: []
     };
     var idCheck = ObjectId.isValid(req.params.id);
     if (!idCheck) {
@@ -141,14 +141,15 @@ app.delete('/api/product/:id', (req, res) => {
     db.collection('product').deleteOne(
         { "_id": new ObjectId(req.params.id) },
         { new: true, returnOriginal: false }
-    ).then(function (deleted_result) {
-        result_json.api_status = "good";
-        result_json.data.push(req.params.id);
-        res.status(200).json(result_json);
-    }).catch(function (err) {
-        result_json.api_status = "error";
-        result_json.data = err;
-        res.status(500).json(result_json)
-    })
-
+    )
+        .then(function (coll) {
+            result_json.api_status = "good";
+            result_json.data = [req.params.id];
+            res.status(200).json(result_json);
+        })
+        .catch(function (err) {
+            result_json.api_status = "error";
+            result_json.data = err;
+            res.status(500).json(result_json)
+        })
 })
