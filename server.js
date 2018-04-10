@@ -32,11 +32,26 @@ app.post('/api/product', (req, res) => {
         api_status: "",
         data: {}
     };
+    var name = req.body.name;
+    var price = req.body.price;
+    if (!name || name.length < 2 || name.length > 50) {
+        result_json.api_status = "error";
+        result_json.data = '"Name" is required and must be a string with length between 0 and 50';
+        return res.status(400).json(result_json)
+    }
+    if (typeof price !== 'number') {
+        price = parseInt(price);
+      }
+    if (isNaN(price) || price < 0) {
+        result_json.api_status = "error";
+        result_json.data = '"Price" is required and must be number';
+        return res.status(400).json(result_json)
+    }
     db.collection('product').save(req.body
     ).then(function (result) {
         result_json.api_status = "good";
-            result_json.data = result.ops[0];
-            res.status(201).json(result_json);
+        result_json.data = result.ops[0];
+        res.status(201).json(result_json);
     }).catch(function (err) {
         result_json.api_status = "error";
         result_json.data = err;
@@ -74,6 +89,21 @@ app.put('/api/product/:id', (req, res) => {
         api_status: "",
         data: {}
     };
+    var name = req.body.name;
+    var price = req.body.price;
+    if (!name || name.length < 2 || name.length > 50) {
+        result_json.api_status = "error";
+        result_json.data = '"Name" is required and must be a string with length between 0 and 50';
+        return res.status(400).json(result_json)
+    }
+    if (typeof price !== 'number') {
+        price = parseInt(price);
+      }
+    if (isNaN(price) || price < 0) {
+        result_json.api_status = "error";
+        result_json.data = '"Price" is required and must be number';
+        return res.status(400).json(result_json)
+    }
     var idCheck = ObjectId.isValid(req.params.id);
     if (!idCheck) {
         result_json.api_status = "error";
